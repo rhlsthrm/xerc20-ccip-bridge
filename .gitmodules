@@ -1,3 +1,9 @@
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "lib/ccip"]
+	path = lib/ccip
+	url = https://github.com/smartcontractkit/ccip
+[submodule "lib/xERC20"]
+	path = lib/xERC20
+	url = https://github.com/defi-wonderland/xERC20
