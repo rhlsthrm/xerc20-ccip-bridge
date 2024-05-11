@@ -122,9 +122,10 @@ contract CCIPxERC20Bridge is CCIPReceiver, OwnerIsCreator {
 
     function addXERC20ForOriginChain(
         uint64 _chainSelector,
-        address _xerc20
+        address _xerc20remote,
+        address _xerc20local
     ) external onlyOwner {
-        xerc20sByChain[_chainSelector][_xerc20] = _xerc20;
+        xerc20sByChain[_chainSelector][_xerc20remote] = _xerc20local;
     }
 
     function addXERC20Config(
@@ -322,14 +323,15 @@ contract CCIPxERC20Bridge is CCIPReceiver, OwnerIsCreator {
         address localXERC20 = xerc20sByChain[
             any2EvmMessage.sourceChainSelector
         ][address(_xerc20)];
+
         XERC20Config memory xerc20Config = xerc20s[IXERC20(localXERC20)];
-        if (address(xerc20Config.lockbox) == address(0)) {
-            // no lockbox, mint directly to recipient
-            IXERC20(_xerc20).mint(_recipient, _amount);
-        } else {
-            // withdraw from lockbox
+
+        if (address(xerc20Config.lockbox) == address(0)) {            // no lockbox, mint directly to recipient
+            IXERC20(localXERC20).mint(_recipient, _amount);
+
+        } else {            // withdraw from lockbox
             // mint to this contract
-            IXERC20(_xerc20).mint(address(this), _amount);
+            IXERC20(localXERC20).mint(address(this), _amount);
             // withdraw from lockbox, erc20 will be transferred to this contract
             xerc20Config.lockbox.withdraw(_amount);
             // transfer erc20s to recipient
